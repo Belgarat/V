@@ -1,21 +1,22 @@
 {
-  "name": "vslackot",
+  "name": "demo_vins",
   "version": "1.0.0",
-  "main": "server.js",
+  "description": "Test for Slack Application",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "author": "Giovanni Colacitti",
   "license": "ISC",
-  "description": "",
+  "engines": {
+    "node": "^20"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  },
   "dependencies": {
-    "axios": "^1.8.3",
-    "body-parser": "^1.20.3",
-    "crypto": "^1.0.1",
+    "@slack/bolt": "^4.2.1",
     "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "express-rate-limit": "^7.5.0"
+    "ngrok": "^5.0.0-beta.2"
   }
 }
