@@ -68,104 +68,219 @@ app.event('app_home_opened', async ({ event, say, client, view }) => {
 app.command('/referenti', async ({ ack, body, client, logger }) => {
     // Acknowledge the command request
     await ack();
+    const inputNames = ['Giovanni Colacitti'];
+    const usersList = await client.users.list();
+    const matchedUsers = usersList.members.filter(u =>
+        inputNames.includes(u.real_name.toLowerCase()) || inputNames.includes(u.name.toLowerCase())
+    );
+    const formattedNames = matchedUsers.map(u => `<@${u.id}>`).join('\\n');
+
+    console.log('Comando REFERENTI richiamato', matchedUsers);
 
     try {
         // Call views.open with the built-in client
-        const result = await client.views.open({
-            // Pass a valid trigger_id within 3 seconds of receiving it
-            trigger_id: body.trigger_id,
-            // View payload
-            view: {
-                type: 'modal',
-                // View identifier
-                callback_id: 'view_1',
-                title: {
-                    type: 'plain_text',
-                    text: 'Titolo della Modale'
-                },
-                blocks: [
-                    {
-                        type: 'section',
-                        text: {
-                            type: 'mrkdwn',
-                            text: 'Welcome to a modal with _blocks_'
-                        },
-                        accessory: {
-                            type: 'button',
-                            text: {
-                                type: 'plain_text',
-                                text: 'Click me!'
-                            },
-                            action_id: 'button_abc'
-                        }
-                    },
-                    {
-                        type: 'input',
-                        block_id: 'input_c',
-                        label: {
-                            type: 'plain_text',
-                            text: 'What are your hopes and dreams?'
-                        },
-                        element: {
-                            type: 'plain_text_input',
-                            action_id: 'dreamy_input',
-                            multiline: true
-                        }
+        client.chat.postMessage({
+            channel: body.channel_id,
+            text: 'Testo',
+            blocks: [
+                {
+                    'type': 'section',
+                    'text': {
+                        'type': 'mrkdwn',
+                        'text': ':wave: Ciao Ragazzo, sono felice di darti questa informazione.\n\n*Di seguito i nostri referenti:*'
                     }
-                ],
-                submit: {
-                    type: 'plain_text',
-                    text: 'Submit'
+                },
+                {
+                    'type': 'divider'
+                },
+                {
+                    'type': 'section',
+                    'text': {
+                        'type': 'mrkdwn',
+                        'text': `*Front End*\nQui abbiamo il fantastico *Giovanni Colacitti*!! ${formattedNames} They have something for everyone here`
+                    },
+                    'accessory': {
+                        'type': 'image',
+                        'image_url': 'https://kinsta.com/it/wp-content/uploads/sites/2/2021/12/front-end-developer-1024x512.png',
+                        'alt_text': 'alt text for image'
+                    }
+                },
+                {
+                    'type': 'section',
+                    'text': {
+                        'type': 'mrkdwn',
+                        'text': '*Back End*\nQui abbiamo il Sexy *Aristide Cittadino*!!'
+                    },
+                    'accessory': {
+                        'type': 'image',
+                        'image_url': 'https://www.codemotion.com/magazine/wp-content/uploads/2024/02/image-2.png',
+                        'alt_text': 'alt text for image'
+                    }
+                },
+
+                {
+                    'type': 'section',
+                    'text': {
+                        'type': 'mrkdwn',
+                        'text': '*Sistemi*\nQui abbiamo il poliedrico *Marco Brunet*!!'
+                    },
+                    'accessory': {
+                        'type': 'image',
+                        'image_url': 'https://www.unidprofessional.com/wp-content/uploads/2022/06/sistemista-chi-e-di-cosa-si-occupa-come-diventarlo.jpg',
+                        'alt_text': 'alt text for image'
+                    }
+                },
+                {
+                    "type": "divider"
                 }
-            }
-        });
-        logger.info(result);
+            ]
+        });;
     }
     catch (error) {
+        console.error('Errore nel comando');
         logger.error(error);
     }
 });
 
-// Listen for a button invocation with action_id `button_abc` (assume it's inside of a modal)
-app.action('button_abc', async ({ ack, body, client, logger }) => {
-    // Acknowledge the button request
+// Listen for a slash command invocation
+app.command('/help', async ({ ack, body, client, logger }) => {
+    // Acknowledge the command request
     await ack();
+    console.log('Comando HELP richiamato');
 
     try {
-        // Call views.update with the built-in client
-        const result = await client.views.update({
-            // Pass the view_id
-            view_id: body.view.id,
-            // Pass the current hash to avoid race conditions
-            hash: body.view.hash,
-            // View payload with updated blocks
-            view: {
-                type: 'modal',
-                // View identifier
-                callback_id: 'view_1',
-                title: {
-                    type: 'plain_text',
-                    text: 'Modale Aggiornata'
-                },
-                blocks: [
-                    {
-                        type: 'section',
-                        text: {
-                            type: 'plain_text',
-                            text: 'You updated the modal!'
-                        }
-                    },
-                    {
-                        type: 'image',
-                        image_url: 'https://images.ctfassets.net/hrltx12pl8hq/7JnR6tVVwDyUM8Cbci3GtJ/bf74366cff2ba271471725d0b0ef418c/shutterstock_376532611-og.jpg',
-                        alt_text: 'Yay! The modal was updated'
+        // Call views.open with the built-in client
+        client.chat.postMessage({
+            channel: body.channel_id,
+            text: 'Testo',
+            blocks: [
+                {
+                    'type': 'section',
+                    'text': {
+                        'type': 'mrkdwn',
+                        'text': 'Ciao Ragazzo :wave:\n*di seguito la lista dei comandi utili:*'
                     }
-                ]
-            }
-        });
-        logger.info(result);
+                },
+                {
+                    'type': 'divider'
+                },
+                {
+                    type: "section",
+                    text: {
+                        type: "mrkdwn",
+                        text: "> /referenti\n> _Tutti i mentori a tua disposizione, contatta uno di loro per supporto operativo_"
+                    }
+                },
+                {
+                    type: "section",
+                    text: {
+                        type: "mrkdwn",
+                        text: "> /tools\n> _Tutti gli strumenti aziendali, utilizza quelli che fanno al caso tuo_"
+                    }
+                },
+                {
+                    "type": "divider"
+                },
+            ]
+        });;
     }
     catch (error) {
+        console.error('Errore nel comando');
         logger.error(error);
     }
+});
+
+// Listen for a slash command invocation
+app.command('/tools', async ({ ack, body, client, logger }) => {
+    // Acknowledge the command request
+    await ack();
+    console.log('Comando TOOLS richiamato');
+
+    try {
+        // Call views.open with the built-in client
+        client.chat.postMessage({
+            channel: body.channel_id,
+            text: 'Testo',
+            blocks: [
+                {
+                    'type': 'section',
+                    'text': {
+                        'type': 'mrkdwn',
+                        'text': ':wave: Ciao Ragazzo, sono felice di darti questa informazione.\n\n*Di seguito gli strumenti a nostra disposizione:*'
+                    }
+                },
+                {
+                    'type': 'divider'
+                },
+                {
+                    'type': 'section',
+                    'text': {
+                        'type': 'mrkdwn',
+                        'text': `*Jira*\n_Strumento per la gestione dei task_!!`
+                    },
+                    'accessory': {
+                        'type': 'image',
+                        'image_url': 'https://play-lh.googleusercontent.com/_AZCbg39DTuk8k3DiPRASr9EwyW058pOfzvAu1DsfN9ygtbOlbuucmXaHJi5ooYbokQX',
+                        'alt_text': 'alt text for image'
+                    }
+                },
+                {
+                    'type': 'section',
+                    'text': {
+                        'type': 'mrkdwn',
+                        'text': `*Confluence*\n_Strumento per la gestione delle documentazioni_!!`
+                    },
+                    'accessory': {
+                        'type': 'image',
+                        'image_url': 'https://play-lh.googleusercontent.com/-aex9dK8-hchgNFf5lsMCy0_9sl6kK_JIS4nh-6p3_NG9w2BwASOTRsNg-tgnONg8Q',
+                        'alt_text': 'alt text for image'
+                    }
+                },
+                {
+                    "type": "actions",
+                    "block_id": "actionblock_x",
+                    "elements": [
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Google"
+                            },
+                            "url": "https://www.google.com"
+                        }
+                    ]
+                },
+                {
+                    "type": "divider"
+                }
+            ]
+        });
+    }
+    catch (error) {
+        console.error('Errore nel comando');
+        logger.error(error);
+    }
+});
+
+app.action('open_site_button', async ({ ack, body, client }) => {
+    console.log('Action OPEN SITE BUTTON richiamato');
+    await ack();
+
+    const channel = body.channel.id;
+    const messageTs = body.message.ts;
+
+    await client.chat.update({
+        channel: channel,
+        ts: messageTs,
+        blocks: [
+            {
+                type: "section",
+                text: {
+                    type: "mrkdwn",
+                    text: "🔗 <https://acsoftware.it|Clicca qui per aprire ACSoftware.it>"
+                }
+            }
+        ],
+        text: "Link aggiornato"
+    });
 });
