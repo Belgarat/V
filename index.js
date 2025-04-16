@@ -14,7 +14,23 @@ const app = new App({
 })();
 
 app.event('message', async ({ event, say, client, view }) => {
-    say('Ciao a tutti')
+
+    console.log('MESSAGGIO:', event);
+
+    const currentMessage = event.text.toLowerCase();
+
+    switch (currentMessage) {
+        case 'hola vins':
+            say(`Ciao <@${event.user}>!!\nSono proprio io Vins\nche ne dici Sushi??`);
+            break;
+        case 'ciao vins':
+            say(`Ciao <@${event.user}> :wave:\nRicorda che ci sono sempre se avete bisogno`);
+            break;
+        case 'vins permessi':
+            say(`Certo ti riassumo le richieste di oggi\nL\'utente X ha richiesto 4:00h di Permessi per il giorno 17 Giusgno 2025 dalle 14:00 alle 18:00.`);
+            break;
+    }
+
 });
 
 // Listen to the app_home_opened event, and when received, respond with a message including the user being messaged
@@ -68,14 +84,6 @@ app.event('app_home_opened', async ({ event, say, client, view }) => {
 app.command('/referenti', async ({ ack, body, client, logger }) => {
     // Acknowledge the command request
     await ack();
-    const inputNames = ['Giovanni Colacitti'];
-    const usersList = await client.users.list();
-    const matchedUsers = usersList.members.filter(u =>
-        inputNames.includes(u.real_name.toLowerCase()) || inputNames.includes(u.name.toLowerCase())
-    );
-    const formattedNames = matchedUsers.map(u => `<@${u.id}>`).join('\\n');
-
-    console.log('Comando REFERENTI richiamato', matchedUsers);
 
     try {
         // Call views.open with the built-in client
@@ -97,7 +105,7 @@ app.command('/referenti', async ({ ack, body, client, logger }) => {
                     'type': 'section',
                     'text': {
                         'type': 'mrkdwn',
-                        'text': `*Front End*\nQui abbiamo il fantastico *Giovanni Colacitti*!! ${formattedNames} They have something for everyone here`
+                        'text': `*Front End*\nQui abbiamo il fantastico *Giovanni Colacitti*!!`
                     },
                     'accessory': {
                         'type': 'image',
@@ -225,6 +233,23 @@ app.command('/tools', async ({ ack, body, client, logger }) => {
                     }
                 },
                 {
+                    "type": "actions",
+                    "block_id": "actionblock_jira",
+                    "elements": [
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Go to Jira"
+                            },
+                            "url": "https://www.atlassian.com/it/software/jira"
+                        }
+                    ]
+                },
+                {
+                    'type': 'divider'
+                },
+                {
                     'type': 'section',
                     'text': {
                         'type': 'mrkdwn',
@@ -238,20 +263,49 @@ app.command('/tools', async ({ ack, body, client, logger }) => {
                 },
                 {
                     "type": "actions",
-                    "block_id": "actionblock_x",
+                    "block_id": "actionblock_confluence",
                     "elements": [
                         {
                             "type": "button",
                             "text": {
                                 "type": "plain_text",
-                                "text": "Google"
+                                "text": "Go to Confluence"
                             },
-                            "url": "https://www.google.com"
+                            "url": "https://www.atlassian.com/software/confluence"
                         }
                     ]
                 },
                 {
-                    "type": "divider"
+                    'type': 'divider'
+                },
+                {
+                    'type': 'section',
+                    'text': {
+                        'type': 'mrkdwn',
+                        'text': `*Udemy*\n_Il nostro canale di videocorsi_!!`
+                    },
+                    'accessory': {
+                        'type': 'image',
+                        'image_url': 'https://play-lh.googleusercontent.com/wKwW77zj6Gd-llTDakdjSDnWUPKSMDGXhnZSXel3A3qQSiM1cbDvuspBpQk15tiT9ik',
+                        'alt_text': 'alt text for image'
+                    }
+                },
+                {
+                    "type": "actions",
+                    "block_id": "actionblock_udemy",
+                    "elements": [
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Go to Udemy"
+                            },
+                            "url": "https://www.udemy.com/"
+                        }
+                    ]
+                },
+                {
+                    'type': 'divider'
                 }
             ]
         });
@@ -260,27 +314,4 @@ app.command('/tools', async ({ ack, body, client, logger }) => {
         console.error('Errore nel comando');
         logger.error(error);
     }
-});
-
-app.action('open_site_button', async ({ ack, body, client }) => {
-    console.log('Action OPEN SITE BUTTON richiamato');
-    await ack();
-
-    const channel = body.channel.id;
-    const messageTs = body.message.ts;
-
-    await client.chat.update({
-        channel: channel,
-        ts: messageTs,
-        blocks: [
-            {
-                type: "section",
-                text: {
-                    type: "mrkdwn",
-                    text: "🔗 <https://acsoftware.it|Clicca qui per aprire ACSoftware.it>"
-                }
-            }
-        ],
-        text: "Link aggiornato"
-    });
 });
