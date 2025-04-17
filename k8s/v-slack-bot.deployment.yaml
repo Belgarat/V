@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: v-slack-bot
-        image: your-docker-repo/slack-bot:latest
+        image: nexus.acsoftware.it:18078/acs-sites/vbot:0.0.1
         ports:
         - containerPort: 3000
         env:
@@ -29,6 +29,8 @@ spec:
             secretKeyRef:
               name: slack-bot-secrets
               key: SLACK_SIGNING_SECRET
+      imagePullSecrets:
+        - name: acs-nexus-docker-s3-secret
 ---
 apiVersion: v1
 kind: Service

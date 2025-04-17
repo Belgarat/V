@@ -1,31 +1,44 @@
 require("dotenv").config();
-const express = require("express");
-const bodyParser = require("body-parser");
-const { verifySlackSignature } = require("./utils");
+const { App, ExpressReceiver } = require("@slack/bolt");
 const rateLimit = require("express-rate-limit");
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+// ExpressReceiver ti permette di usare middleware Express (es. rate-limit)
+const receiver = new ExpressReceiver({
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  endpoints: "/slack/webhook",
+});
 
-app.use(bodyParser.json());
-
-// Limita il numero di richieste al minuto per evitare sovraccarichi
-const limiter = rateLimit({
+receiver.router.use(
+  "/slack/webhook",
+  rateLimit({
     windowMs: 60 * 1000,
     max: 10,
     message: "Masa roba, speta an cin!",
-});
-app.use("/slack/webhook", limiter);
+  })
+);
 
-app.post("/slack/webhook", verifySlackSignature, async (req, res) => {
-    const { event } = req.body;
-    console.log("Ho capì:", event);
-    if (event && event.type === "message" && !event.subtype) {
-        console.log(`Ciacole da ${event.user}: ${event.text}`);
-    }
-    res.sendStatus(200);
+const app = new App({
+  token: process.env.SLACK_BOT_TOKEN,
+  receiver,
 });
 
-app.listen(PORT, () => {
-    console.log(`Te scolte sula porta ${PORT}`);
+// Risponde ai messaggi testuali (non bot, non file, non join)
+app.event("message", async ({ event, say, logger }) => {
+  if (!event.subtype && event.text) {
+    logger.info(`Ciacole da ${event.user}: ${event.text}`);
+
+    // Risposta nel canale
+    await say({
+      text: `Go sentìo: "${event.text}" – bel messaggio!`,
+      thread_ts: event.ts // Se vuoi rispondere in thread
+      // Rimuovi `thread_ts` se vuoi una risposta normale fuori dal thread
+    });
+  }
 });
+
+// Avvio dell'app
+(async () => {
+  const port = process.env.PORT || 3000;
+  await app.start(port);
+  console.log(`Te scolte sula porta ${port}`);
+})();
