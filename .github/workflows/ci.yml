@@ -2,7 +2,7 @@ name: Trigger Jenkins if version changed
 
 on:
   push:
-    branches: [ main ]
+    branches: [ develop ]
 
 jobs:
   check-version-and-trigger:
