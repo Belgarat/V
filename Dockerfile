@@ -15,4 +15,4 @@ RUN npm install --omit=dev
 EXPOSE 3000
 
 # Comando per avviare l'app
-CMD ["node", "server.js"]
+CMD ["node", "index.js"]

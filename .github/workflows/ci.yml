@@ -1,0 +1,45 @@
+name: Trigger Jenkins if version changed
+
+on:
+  push:
+    branches: [ develop ]
+
+jobs:
+  check-version-and-trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Get previous commit
+        id: previous
+        run: echo "commit=$(git rev-parse HEAD^1)" >> $GITHUB_OUTPUT
+
+      - name: Get old version
+        id: old
+        run: |
+          git show ${{ steps.previous.outputs.commit }}:package.json > old_package.json
+          echo "version=$(jq -r .version old_package.json)" >> $GITHUB_OUTPUT
+
+      - name: Get new version
+        id: new
+        run: |
+          echo "version=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
+
+      - name: Debug versions
+        run: |
+          echo "Old version: ${{ steps.old.outputs.version }}"
+          echo "New version: ${{ steps.new.outputs.version }}"
+
+      - name: Trigger Jenkins (only if version changed)
+        if: steps.old.outputs.version != steps.new.outputs.version
+        env:
+          JENKINS_URL: ${{ secrets.JENKINS_URL }}
+          JENKINS_USER: ${{ secrets.JENKINS_USER }}
+          JENKINS_TOKEN: ${{ secrets.JENKINS_TOKEN }}
+        run: |
+          echo "Triggering Jenkins job..."
+          curl -X POST "$JENKINS_URL" \
+            --user "$JENKINS_USER:$JENKINS_TOKEN"
