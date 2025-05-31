@@ -36,12 +36,12 @@ app.event('message', async ({ event, say, client, view }) => {
 // Listen to the app_home_opened event, and when received, respond with a message including the user being messaged
 app.event('app_home_opened', async ({ event, say, client, view }) => {
 
-    app.logger.info('⚡️Hello! Someone just opened the app to DM so we will send them a message!');
+    /*app.logger.info('⚡️Hello! Someone just opened the app to DM so we will send them a message!');
     say(`Hello world and <@${event.user}>! `);
     const date = new Date();
     setTimeout(async () => {
         say(`This is current date <@${date}>! `);
-    }, 2000);
+    }, 2000);*/
 
     // Design App HOME TAB
     try {
